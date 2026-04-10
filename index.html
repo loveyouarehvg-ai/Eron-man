@@ -145,7 +145,30 @@
         let isGodMode = false;
         const bgEmojis = ['💸', '👛', '🤑', '💲', '💴', '💵'];
 
-        // ปรับปรุงการกระจาย Emoji ฉากหลังให้ทั่วถึง
+        // Music System
+        const playlists = ['sake_binks.mp3', 'binksake_brook.mp3'];
+        let currentTrack = 0;
+        const audio = new Audio(playlists[currentTrack]);
+        
+        function playNext() {
+            currentTrack = (currentTrack + 1) % playlists.length;
+            audio.src = playlists[currentTrack];
+            audio.play().catch(() => console.log("Click screen to play music"));
+        }
+        audio.onended = playNext;
+        window.addEventListener('click', () => audio.play(), { once: true });
+
+        // Money Quotes
+        const moneyQuotes = [
+            "ตังไม่พอไอ้จนไอ้ขมวยหัวเคน",
+            "เงินไม่ใช่ทุกอย่าง แต่ทุกอย่างต้องใช้เงิน",
+            "ความโลภไม่มีที่สิ้นสุด แต่เงินในกระเป๋ามีขีดจำกัด",
+            "อยากรวยทางลัด ให้กดโกง x2 สิครับ Achi",
+            "กำขี้ดีกว่ากำตด แต่กำเงินสดดีกว่ากำขี้",
+            "ท้องฟ้ายังมีดาวยังมีเดือน แต่กระเป๋าคุณเพื่อนไม่มีเงิน",
+            "เป็นได้แค่ผู้แสวงหาเศษเงิน เพราะตังคุณเดินมาไม่ถึงไอเทมนี้"
+        ];
+
         const bg = document.getElementById('money-bg-container');
         for(let i=0; i<80; i++){
             const span = document.createElement('span');
@@ -187,7 +210,6 @@
             items.push(it);
         }
 
-        // โกงเงินเพียวๆ ไม่เรียก Emoji Particle ออกมาให้เกะกะ
         function cheatX2() {
             balance *= 2;
             updateUI();
@@ -227,7 +249,6 @@
         }
 
         function buy(id) {
-            // ลบระบบตรวจสอบการรัวของย่าออกแล้ว
             const item = items.find(x => x.id === id);
             const input = document.getElementById(`in-${id}`);
             const qty = parseInt(input.value) || 0;
@@ -256,8 +277,30 @@
             } else {
                 document.body.classList.add('screen-shake');
                 setTimeout(() => document.body.classList.remove('screen-shake'), 400);
-                alert("ตังไม่พอไอ้จนไอ้ขมวยหัวเคน");
+                const randomQuote = moneyQuotes[Math.floor(Math.random() * moneyQuotes.length)];
+                alert(randomQuote);
             }
+        }
+
+        function sell(id) {
+            const item = items.find(x => x.id === id);
+            const input = document.getElementById(`in-${id}`);
+            const qty = parseInt(input.value) || 0;
+            
+            if(qty <= 0 || item.count <= 0) {
+                document.body.classList.add('screen-shake');
+                setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+                return;
+            }
+
+            const sellQty = Math.min(qty, item.count);
+            item.count -= sellQty;
+            totalSpent -= (item.price * sellQty);
+            document.getElementById(`cnt-${id}`).innerText = item.count.toLocaleString();
+            
+            for(let i=0; i<5; i++) spawnParticle('💸');
+            
+            updateUI();
         }
 
         function renderReceipt() {
@@ -267,13 +310,18 @@
                 document.getElementById('receipt-header').innerText = "มหาตำนานความรวย ACHI";
                 document.getElementById('receipt-box').style.borderColor = "#d4af37";
             }
-            if(bought.length === 0) return;
+            if(bought.length === 0) {
+                content.innerHTML = '<p class="text-center italic opacity-30">กิเลสยังไม่เกิด...</p>';
+                document.getElementById('final-price').innerText = "$0";
+                return;
+            }
             content.innerHTML = bought.map(x => `
                 <div class="flex justify-between items-center border-b border-zinc-900 pb-3">
                     <span class="text-white font-bold text-[10px] md:text-base">${x.emoji} ${x.name} <small class="text-zinc-600 ml-1">x${x.count}</small></span>
                     <span class="text-yellow-600 font-mono font-bold text-[10px] md:text-base">$${(x.price * x.count).toLocaleString()}</span>
                 </div>
             `).join('');
+            document.getElementById('final-price').innerText = "$" + totalSpent.toLocaleString();
         }
 
         const grid = document.getElementById('item-grid');
@@ -288,7 +336,10 @@
                     <span id="cnt-${item.id}" class="text-xs md:text-3xl font-black gold-gradient">0</span>
                 </div>
                 <input type="number" id="in-${item.id}" placeholder="0" class="w-full bg-zinc-900 border border-zinc-800 text-center py-1 md:py-4 rounded-lg md:rounded-2xl mb-2 text-white font-bold text-xs md:text-xl outline-none focus:border-yellow-500">
-                <button onclick="buy(${item.id})" class="w-full bg-yellow-600 text-black py-2 md:py-5 rounded-lg md:rounded-2xl font-black hover:bg-yellow-400 active:scale-95 transition-all shadow-lg text-[8px] md:text-base">ซื้อไอ้ขมวย</button>
+                <div class="flex gap-1">
+                    <button onclick="buy(${item.id})" class="flex-1 bg-yellow-600 text-black py-2 md:py-5 rounded-lg md:rounded-2xl font-black hover:bg-yellow-400 active:scale-95 transition-all shadow-lg text-[8px] md:text-base">SHOP🤑</button>
+                    <button onclick="sell(${item.id})" class="bg-zinc-800 text-white px-2 py-2 md:py-5 rounded-lg md:rounded-2xl font-black hover:bg-red-900 active:scale-95 transition-all text-[8px] md:text-base">ขาย</button>
+                </div>
             `;
             grid.appendChild(div);
         });
