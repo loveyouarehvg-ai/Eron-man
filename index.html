@@ -29,16 +29,18 @@
 
         #money-bg-container {
             position: fixed;
-            top: -10%; left: -10%;
-            width: 120vw; height: 120vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             pointer-events: none;
             z-index: -1;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            align-content: space-around;
         }
-        .bg-emoji { font-size: 2.5rem; opacity: 0.12; filter: blur(1px); transition: transform 0.1s ease-out; }
+        .bg-emoji { 
+            position: absolute;
+            font-size: 2.5rem; 
+            opacity: 0.12; 
+            filter: blur(1px); 
+            transition: transform 0.1s ease-out; 
+        }
 
         .gold-gradient {
             background: linear-gradient(135deg, #d4af37 0%, #f9f295 50%, #d4af37 100%);
@@ -101,7 +103,7 @@
 
     <div class="text-center py-12">
         <h1 id="title-main" class="text-6xl font-black gold-gradient uppercase cursor-pointer select-none transition-all active:scale-75">จำลองความ(โลภ)</h1>
-        <p class="text-zinc-500 text-xs tracking-[0.5em] mt-3 font-bold">BY ACHI🦛 - 10 EASTER EGGS ACTIVE</p>
+        <p class="text-zinc-500 text-xs tracking-[0.5em] mt-3 font-bold">BY ACHI🦛 - NO LIMIT MODE</p>
     </div>
 
     <div class="sticky-nav py-8 px-6 shadow-2xl">
@@ -140,17 +142,17 @@
     <script>
         let balance = 450000000000000;
         let totalSpent = 0;
-        let clickCount = 0;
-        let lastClickTime = 0;
         let isGodMode = false;
         const bgEmojis = ['💸', '👛', '🤑', '💲', '💴', '💵'];
 
-        // 7. Gyro Effect
+        // ปรับปรุงการกระจาย Emoji ฉากหลังให้ทั่วถึง
         const bg = document.getElementById('money-bg-container');
-        for(let i=0; i<100; i++){
+        for(let i=0; i<80; i++){
             const span = document.createElement('span');
             span.className = 'bg-emoji';
             span.innerText = bgEmojis[Math.floor(Math.random()*bgEmojis.length)];
+            span.style.left = Math.random() * 95 + '%';
+            span.style.top = Math.random() * 95 + '%';
             bg.appendChild(span);
         }
         window.addEventListener('deviceorientation', (e) => {
@@ -185,10 +187,9 @@
             items.push(it);
         }
 
-        // 3. Cheat x2
+        // โกงเงินเพียวๆ ไม่เรียก Emoji Particle ออกมาให้เกะกะ
         function cheatX2() {
             balance *= 2;
-            for(let i=0; i<40; i++) spawnParticle();
             updateUI();
         }
 
@@ -217,7 +218,6 @@
                 else if(totalSpent > 0) rank.innerText = "สถานะ: ผู้เริ่มมีตัง";
             }
 
-            // 6. Ultra Rich Pulse
             if(current > 1000000000000000 || isGodMode) {
                 balDisplay.classList.add('ultra-rich');
             } else {
@@ -227,25 +227,13 @@
         }
 
         function buy(id) {
-            // 8. Grandma Safety (Spam Detection)
-            const now = Date.now();
-            if (now - lastClickTime < 2000) clickCount++;
-            else clickCount = 0;
-            lastClickTime = now;
-            if(clickCount > 10) {
-                alert("ย่าบอกว่า: 'ซื้อเยอะไปแล้วนะลูก เดี๋ยวเครื่องร้อน ระวังไฟดูด!'");
-                clickCount = 0;
-                return;
-            }
-
+            // ลบระบบตรวจสอบการรัวของย่าออกแล้ว
             const item = items.find(x => x.id === id);
             const input = document.getElementById(`in-${id}`);
             const qty = parseInt(input.value) || 0;
             if(qty <= 0) return;
             
-            // 2. Secret Combo 999
             if(qty === 999) {
-                console.log("%cACHI SECRET: THE GREED OF 999", "color: gold; font-size: 20px;");
                 for(let i=0; i<50; i++) setTimeout(() => spawnParticle('💎'), i * 50);
             }
 
@@ -255,11 +243,9 @@
                 totalSpent += cost;
                 document.getElementById(`cnt-${id}`).innerText = item.count.toLocaleString();
                 
-                // 5. Man Utd Love
                 if(item.name.includes("สโมสรแมนยู")) {
                     for(let i=0; i<20; i++) spawnParticle('❤️');
                 } 
-                // 10. Roblox OOF
                 else if(item.name.includes("กองทัพหุ่นยนต์")) {
                     for(let i=0; i<5; i++) spawnParticle('OOF!');
                 }
@@ -268,7 +254,6 @@
                 }
                 updateUI();
             } else {
-                // 1. The Insult & Shake
                 document.body.classList.add('screen-shake');
                 setTimeout(() => document.body.classList.remove('screen-shake'), 400);
                 alert("ตังไม่พอไอ้จนไอ้ขมวยหัวเคน");
@@ -294,7 +279,6 @@
         const grid = document.getElementById('item-grid');
         items.forEach(item => {
             const div = document.createElement('div');
-            // ลด Padding (p-2) และปรับขนาด Card ให้พอดีกับ 3 คอลัมน์ในมือถือ
             div.className = 'item-card p-2 md:p-10 rounded-2xl md:rounded-[3rem] text-center';
             div.innerHTML = `
                 <div class="text-2xl md:text-7xl mb-2 md:mb-6 emoji-icon">${item.emoji}</div>
@@ -309,19 +293,15 @@
             grid.appendChild(div);
         });
 
-        // 3. Title Hue Rotate
         document.getElementById('title-main').onclick = function() {
             this.style.filter = `hue-rotate(${Math.random()*360}deg)`;
             cheatX2();
         };
         
-        // 4. Disco Background
         document.getElementById('title-main').ondblclick = function() {
             document.body.style.backgroundColor = `hsl(${Math.random() * 360}, 50%, 10%)`;
-            for(let i=0; i<30; i++) spawnParticle('✨');
         };
 
-        // 9. GodVerse Mode (Long Press)
         let timer;
         const balBtn = document.getElementById('balance-display');
         balBtn.addEventListener('mousedown', () => { timer = setTimeout(() => { isGodMode = true; updateUI(); alert("ปลดล็อกโหมด GodVerse: มิติที่ 5 ทำงาน!"); }, 2000); });
