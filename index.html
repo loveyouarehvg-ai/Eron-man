@@ -145,29 +145,18 @@
         let isGodMode = false;
         const bgEmojis = ['💸', '👛', '🤑', '💲', '💴', '💵'];
 
-        // Music System - Adjusted for immediate play on interaction
+        // Music System - Adjusted Sequence
         const playlists = ['binksake_brook.mp3', 'sake_binks.mp3'];
         let currentTrack = 0;
         const audio = new Audio(playlists[currentTrack]);
-        audio.preload = "auto";
         
         function playNext() {
             currentTrack = (currentTrack + 1) % playlists.length;
             audio.src = playlists[currentTrack];
-            audio.play().catch(e => console.log("Waiting for user interaction..."));
+            audio.play().catch(() => console.log("Click screen to play music"));
         }
         audio.onended = playNext;
-
-        // ฟังก์ชันเริ่มเพลงทันทีเมื่อมีการขยับหรือคลิกในเว็บ
-        const startMusic = () => {
-            audio.play().catch(e => console.log("Autoplay blocked, waiting for click..."));
-            window.removeEventListener('mousedown', startMusic);
-            window.removeEventListener('touchstart', startMusic);
-            window.removeEventListener('scroll', startMusic);
-        };
-        window.addEventListener('mousedown', startMusic);
-        window.addEventListener('touchstart', startMusic);
-        window.addEventListener('scroll', startMusic);
+        window.addEventListener('click', () => audio.play(), { once: true });
 
         // Money Quotes
         const moneyQuotes = [
