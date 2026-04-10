@@ -12,7 +12,38 @@
             color: #e5e5e5;
             font-family: 'Prompt', sans-serif;
             background-image: radial-gradient(circle at top right, #1a1a10, transparent);
+            overflow-x: hidden;
+            min-height: 100vh;
         }
+
+        /* --- เพิ่มส่วนฉากหลังลอยไปมา --- */
+        #money-bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .bg-money {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.2;
+            transition: transform 0.1s ease-out; /* เพื่อให้ลอยตามการเอียงแบบนุ่มนวล */
+            will-change: transform;
+        }
+        @keyframes float-around {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        .floating-anim {
+            animation: float-around 4s ease-in-out infinite;
+        }
+        /* --------------------------- */
+
         .luxury-text { font-family: 'Cinzel', serif; letter-spacing: 2px; }
         .gold-gradient {
             background: linear-gradient(135deg, #d4af37 0%, #f9f295 50%, #d4af37 100%);
@@ -39,7 +70,6 @@
             transform: translateY(-8px);
             box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
         }
-        /* แอนิเมชันเด้งดึ๋ง (Bouncy Active) */
         @keyframes bounce-click {
             0% { transform: scale(1); }
             30% { transform: scale(0.8) rotate(-2deg); }
@@ -49,6 +79,18 @@
         }
         .bouncy-active { animation: bounce-click 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
+        @keyframes money-fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) translateX(100px) rotate(360deg); opacity: 0; }
+        }
+        .money-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99;
+            font-size: 2rem;
+            animation: money-fall 3s linear forwards;
+        }
+
         button { transition: transform 0.2s; }
         button:active { transform: scale(0.9); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -58,8 +100,10 @@
 </head>
 <body>
 
+    <div id="money-bg-container"></div>
+
     <div class="text-center py-12 border-b border-zinc-900">
-        <h1 class="text-6xl mb-3 luxury-text gold-gradient font-bold uppercase">จำลองความ(โลภ)</h1>
+        <h1 id="main-title" class="text-6xl mb-3 luxury-text gold-gradient font-bold uppercase cursor-pointer transition-all active:scale-95">จำลองความ(โลภ)</h1>
         <p class="text-zinc-500 tracking-widest uppercase text-sm font-bold">By Achi🦛 - Ultimate Wealth Simulator</p>
     </div>
 
@@ -87,7 +131,7 @@
     <div class="container mx-auto px-6 pb-32">
         <div class="bg-zinc-950 p-10 rounded-2xl border border-zinc-800 max-w-3xl mx-auto shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 w-1 h-full bg-yellow-600"></div>
-            <h3 class="text-3xl luxury-text mb-8 text-center gold-gradient font-bold uppercase">ใบเสร็จแห่งความโลภ</h3>
+            <h3 id="receipt-title" class="text-3xl luxury-text mb-8 text-center gold-gradient font-bold uppercase">ใบเสร็จแห่งความโลภ</h3>
             <div id="receipt-list" class="space-y-4 mb-8 border-b border-zinc-800 pb-8 text-zinc-400">
                 <p class="text-center italic opacity-50">ยังไม่มีการตอบสนองต่อกิเลส</p>
             </div>
@@ -102,6 +146,38 @@
         let balance = 450000000000000; 
         let totalSpent = 0;
         const items = [];
+
+        // --- ระบบฉากหลังเงินลอยตามการเอียง ---
+        const bgContainer = document.getElementById('money-bg-container');
+        const bgMoneyCount = 30;
+        const bgMoneyElements = [];
+
+        for (let i = 0; i < bgMoneyCount; i++) {
+            const el = document.createElement('div');
+            el.innerText = '💸';
+            el.className = 'bg-money floating-anim';
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.top = Math.random() * 100 + 'vh';
+            el.style.animationDelay = Math.random() * 5 + 's';
+            bgContainer.appendChild(el);
+            bgMoneyElements.push({
+                el: el,
+                x: Math.random() * 20 - 10,
+                y: Math.random() * 20 - 10
+            });
+        }
+
+        window.addEventListener('deviceorientation', (event) => {
+            const tiltX = event.gamma; // เอียงซ้าย-ขวา (-90 ถึง 90)
+            const tiltY = event.beta;  // เอียงหน้า-หลัง (-180 ถึง 180)
+            
+            bgMoneyElements.forEach((item) => {
+                const moveX = tiltX * 0.5;
+                const moveY = tiltY * 0.5;
+                item.el.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+        });
+        // ---------------------------------
 
         const itemNames = [
             { n: "เบอร์เกอร์เนื้อวากิวทองคำ", p: 150, e: "🍔" },
@@ -126,8 +202,25 @@
             { n: "ธนาคารพาณิชย์ขนาดใหญ่", p: 8500000000, e: "🏦" }
         ];
 
+        function spawnMoney() {
+            for(let i=0; i<15; i++) {
+                const money = document.createElement('div');
+                money.innerText = '💸';
+                money.className = 'money-particle';
+                money.style.left = Math.random() * 100 + 'vw';
+                money.style.animationDelay = Math.random() * 1 + 's';
+                document.body.appendChild(money);
+                setTimeout(() => money.remove(), 3000);
+            }
+        }
+
+        document.getElementById('main-title').onclick = function() {
+            this.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+        };
+
         function addMoney() {
             balance += 10000000000000;
+            spawnMoney();
             updateUI();
         }
 
@@ -155,6 +248,11 @@
             balanceEl.innerText = "$" + currentBalance.toLocaleString();
             spentDisplay.innerText = "$" + totalSpent.toLocaleString();
             spentFinal.innerText = "$" + totalSpent.toLocaleString();
+            
+            if(balance > 1000000000000000) {
+                balanceEl.classList.add('animate-pulse');
+            }
+
             renderReceipt();
         }
 
@@ -175,13 +273,20 @@
                 if ((balance - totalSpent) >= cost) {
                     item.count += amount;
                     totalSpent += cost;
+                    spawnMoney();
+                    if(amount > 1000) console.log("%cACHI: พลังแห่งกิเลสช่างรุนแรง!", "color: gold; font-size: 20px;");
                 } else {
-                    alert("ความมั่งคั่งไม่เพียงพอ!");
+                    alert("กิเลสหนาแต่กระเป๋าบาง! ไปโกงเงินมาเพิ่มซะ Achi");
                 }
             } else {
                 const sellCount = Math.min(amount, item.count);
                 item.count -= sellCount;
                 totalSpent -= (item.price * sellCount);
+                const s = document.createElement('span');
+                s.innerText = "📉";
+                s.style.position = 'absolute';
+                card.appendChild(s);
+                setTimeout(() => s.remove(), 1000);
             }
             document.getElementById(`count-${id}`).innerText = item.count.toLocaleString();
             updateUI();
@@ -189,6 +294,9 @@
 
         function renderReceipt() {
             const boughtItems = items.filter(i => i.count > 0);
+            
+            if(boughtItems.length > 10) document.getElementById('receipt-title').innerText = "ตำนานมหาเศรษฐี ACHI";
+
             if (boughtItems.length === 0) {
                 receiptList.innerHTML = '<p class="text-center italic opacity-50">ยังไม่มีการตอบสนองต่อกิเลส</p>';
                 return;
@@ -202,6 +310,10 @@
                     <span class="text-yellow-600 font-mono">$${(i.price * i.count).toLocaleString()}</span>
                 </div>
             `).join('');
+
+            if(totalSpent > 1000000000000) {
+                 receiptList.innerHTML += '<p class="text-center text-xs text-yellow-500 mt-4">🏆 ปลดล็อคฉายา: ผู้กลืนกินดวงดาว</p>';
+            }
         }
 
         items.forEach(item => {
@@ -209,7 +321,7 @@
             card.id = `card-${item.id}`;
             card.className = 'item-card p-8 rounded-3xl flex flex-col items-center text-center relative overflow-hidden';
             card.innerHTML = `
-                <div class="text-6xl mb-6 filter drop-shadow-lg">${item.emoji}</div>
+                <div class="text-6xl mb-6 filter drop-shadow-lg cursor-help transition-all hover:scale-125">${item.emoji}</div>
                 <h3 class="text-xl font-bold mb-2 text-white">${item.name}</h3>
                 <p class="text-yellow-500 font-mono text-lg mb-6">$${item.price.toLocaleString()}</p>
                 <div class="bg-black/40 p-4 rounded-2xl w-full mb-4">
@@ -227,6 +339,9 @@
                     </div>
                 </div>
             `;
+            card.onmouseenter = () => { if(item.count > 10) card.querySelector('.text-6xl').style.transform = 'rotate(20deg)'; };
+            card.onmouseleave = () => { card.querySelector('.text-6xl').style.transform = 'rotate(0deg)'; };
+            
             grid.appendChild(card);
         });
     </script>
