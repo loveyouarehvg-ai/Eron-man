@@ -145,8 +145,12 @@
         let isGodMode = false;
         const bgEmojis = ['💸', '👛', '🤑', '💲', '💴', '💵'];
 
-        // Music System - Adjusted Sequence
-        const playlists = ['binksake_brook.mp3', 'sake_binks.mp3'];
+        // Music System - เรียงตามที่คุณกำหนด 1, 2, 3 และเล่นวนลูปเรื่อยๆ
+        const playlists = [
+            'sake_binks.mp3', 
+            'bink_sake_violin.mp3', 
+            'binksake_brook.mp3'
+        ];
         let currentTrack = 0;
         const audio = new Audio(playlists[currentTrack]);
         
