@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACHI ELON WEALTH - LUXURY EDITION</title>
+    <title>ACHI UNIVERSAL WEALTH - GOD MODE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -11,34 +11,53 @@
             background-color: #020202;
             color: #e5e5e5;
             font-family: 'Prompt', sans-serif;
-            background-image: radial-gradient(circle at top right, #1a1a10, transparent);
+            background-image: radial-gradient(circle at top right, #1a1a10, transparent), 
+                              radial-gradient(circle at bottom left, #0a101a, transparent);
+            overflow-x: hidden;
         }
-        .luxury-text { font-family: 'Cinzel', serif; letter-spacing: 2px; }
+        .luxury-text { font-family: 'Cinzel', serif; letter-spacing: 3px; }
         .gold-gradient {
             background: linear-gradient(135deg, #d4af37 0%, #f9f295 50%, #d4af37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
         }
         .sticky-money {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: rgba(5, 5, 5, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.5);
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid #d4af37;
+            transition: all 0.3s;
         }
-        .item-card {
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid #333;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+
+        /* ปุ่มเด้งดึ๋ง (Bouncy Buttons) */
+        button, .item-card {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        .item-card:hover {
-            border-color: #d4af37;
-            transform: translateY(-8px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+        button:active { transform: scale(0.85); }
+        button:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+        /* การ์ดโผล่ตอนเลื่อน (Scroll Animation) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* เอฟเฟกต์เงินขยับ */
+        @keyframes cash-shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(5px); }
+            50% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: cash-shake 0.3s ease-in-out; }
+
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
             -webkit-appearance: none; margin: 0;
         }
@@ -46,92 +65,83 @@
 </head>
 <body>
 
-    <div class="text-center py-12 border-b border-zinc-900">
-        <h1 class="text-6xl mb-3 luxury-text gold-gradient font-bold">ACHI ELON WEALTH</h1>
-        <p class="text-zinc-500 tracking-widest uppercase text-sm">The Ultimate Billionaire Simulator</p>
+    <div class="text-center py-20 border-b border-zinc-900 relative">
+        <h1 class="text-7xl mb-4 luxury-text gold-gradient font-extrabold tracking-tighter">GOD MODE WEALTH</h1>
+        <p class="text-zinc-500 tracking-widest uppercase text-sm">คุณมีเงินเท่ากับความมั่งคั่งทั้งหมดของโลก</p>
     </div>
 
-    <div class="sticky-money py-8 px-4">
+    <div id="header-money" class="sticky-money py-10 px-6">
         <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div class="text-center md:text-left">
-                <p class="text-zinc-500 uppercase text-xs tracking-widest mb-1">เงินคงเหลือ</p>
-                <h2 id="balance" class="text-4xl md:text-6xl font-bold gold-gradient tracking-tighter">$250,000,000,000</h2>
+                <p class="text-zinc-500 uppercase text-xs tracking-widest mb-1 font-bold">World's Remaining Capital</p>
+                <h2 id="balance" class="text-5xl md:text-7xl font-bold gold-gradient tracking-tighter">$450,000,000,000,000</h2>
             </div>
             <div class="text-center md:text-right">
-                <p class="text-zinc-500 uppercase text-xs tracking-widest mb-1">ใช้ไปแล้วทั้งหมด</p>
-                <h2 id="total-spent-display" class="text-3xl md:text-4xl font-bold text-white opacity-80">$0</h2>
+                <p class="text-zinc-500 uppercase text-xs tracking-widest mb-1">Total Assets Purchased</p>
+                <h2 id="total-spent-display" class="text-4xl md:text-5xl font-bold text-white opacity-80">$0</h2>
             </div>
         </div>
     </div>
 
-    <div class="container mx-auto px-6 py-16">
-        <div id="item-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    <div class="container mx-auto px-6 py-20">
+        <div id="item-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
             </div>
     </div>
 
-    <div class="container mx-auto px-6 pb-32">
-        <div class="bg-zinc-950 p-10 rounded-2xl border border-zinc-800 max-w-3xl mx-auto shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-yellow-600"></div>
-            <h3 class="text-3xl luxury-text mb-8 text-center gold-gradient">รายการคำสั่งซื้อของมหาเศรษฐี</h3>
-            <div id="receipt-list" class="space-y-4 mb-8 border-b border-zinc-800 pb-8 text-zinc-400">
-                <p class="text-center italic opacity-50">ยังไม่มีการซื้อขายในขณะนี้</p>
+    <div class="container mx-auto px-6 pb-40">
+        <div class="bg-zinc-950 p-12 rounded-[3rem] border-2 border-zinc-800 max-w-4xl mx-auto shadow-[0_0_50px_rgba(212,175,55,0.1)] relative overflow-hidden reveal">
+            <h3 class="text-4xl luxury-text mb-10 text-center gold-gradient font-bold">World Asset Receipt</h3>
+            <div id="receipt-list" class="space-y-4 mb-10 border-b border-zinc-800 pb-10 text-zinc-400 max-h-96 overflow-y-auto">
+                <p class="text-center italic opacity-50 text-xl">Waiting for transactions...</p>
             </div>
-            <div class="flex justify-between items-center">
-                <span class="text-2xl font-light uppercase tracking-widest">Grand Total</span>
-                <span id="total-spent-final" class="text-4xl font-bold gold-gradient">$0</span>
+            <div class="flex justify-between items-center px-4">
+                <span class="text-2xl font-bold uppercase tracking-[0.3em]">Total Value</span>
+                <span id="total-spent-final" class="text-5xl font-bold gold-gradient">$0</span>
             </div>
         </div>
     </div>
 
     <script>
-        let balance = 250000000000;
+        // เงินทั้งโลกโดยประมาณ (450 Trillion Dollars)
+        let balance = 450000000000000;
         let totalSpent = 0;
         const items = [];
 
         const itemBase = [
-            { n: "เบอร์เกอร์เนื้อวากิวทองคำ", p: 150, e: "🍔" },
-            { n: "กาแฟขี้ชะมดพรีเมียม", p: 80, e: "☕" },
-            { n: "สมาชิก Netflix ตลอดชีพ", p: 5000, e: "📺" },
-            { n: "หูฟังทองคำแท้", p: 12000, e: "🎧" },
-            { n: "OPPO Reno 11 Pro Achi Ed.", p: 25000, e: "📱" },
-            { n: "Gaming PC Set 8K", p: 250000, e: "🖥️" },
-            { n: "นาฬิกา Richard Mille", p: 1500000, e: "⌚" },
-            { n: "Tesla Roadster 2.0", p: 250000, e: "🏎️" },
-            { n: "คฤหาสน์หรูบนเขา", p: 50000000, e: "🏰" },
-            { n: "เครื่องบิน Gulfstream G700", p: 75000000, e: "🛩️" },
-            { n: "เรือยอร์ช 200 เมตร", p: 500000000, e: "🚢" },
-            { n: "ทีมฟุตบอล Man United", p: 6000000000, e: "⚽" },
-            { n: "ภารกิจไปดาวอังคาร", p: 10000000000, e: "🚀" },
-            { n: "เกาะส่วนตัวในดูไบ", p: 150000000, e: "🏝️" }
+            { n: "จ้างคนทั้งโลกเลี้ยงข้าว", p: 8000000000, e: "🍱" },
+            { n: "ซื้อสโมสรแมนยูฯ 1,000 ครั้ง", p: 6000000000000, e: "⚽" },
+            { n: "กองทัพหุ่นยนต์ Iron Man", p: 50000000000, e: "🤖" },
+            { n: "สถานีวิจัยบนดวงจันทร์", p: 150000000000, e: "🌕" },
+            { n: "เมืองลอยฟ้า Cloud City", p: 900000000000, e: "☁️" },
+            { n: "ซื้อประเทศเกาะส่วนตัว", p: 2000000000, e: "🏝️" },
+            { n: "ระบบอินเทอร์เน็ตส่วนตัวทั่วโลก", p: 300000000000, e: "📡" },
+            { n: "ย้อนเวลากลับไปซื้อ Bitcoin", p: 1000000000000, e: "⏳" },
+            { n: "ดาวอังคารทั้งดวง", p: 50000000000000, e: "🔴" },
+            { n: "กาแล็กซี่จำลอง (GodVerse)", p: 100000000000000, e: "🌌" }
         ];
 
-        // Generate 100 items
         for (let i = 0; i < 100; i++) {
             const base = itemBase[i % itemBase.length];
-            // สุ่มราคาให้หลากหลายขึ้น
-            let priceMult = Math.pow(1.15, i);
-            let finalPrice = Math.floor(base.p * priceMult);
-            
-            items.push({
-                id: i,
-                name: base.n + " #" + (i + 1),
-                price: finalPrice,
-                emoji: base.e,
-                count: 0
-            });
+            let finalPrice = Math.floor(base.p * Math.pow(1.2, i % 10));
+            items.push({ id: i, name: base.n + " #" + (i+1), price: finalPrice, emoji: base.e, count: 0 });
         }
 
         const grid = document.getElementById('item-grid');
         const balanceEl = document.getElementById('balance');
         const spentDisplay = document.getElementById('total-spent-display');
-        const spentFinal = document.getElementById('total-spent-final');
-        const receiptList = document.getElementById('receipt-list');
+        const header = document.getElementById('header-money');
 
         function updateUI() {
             const currentBalance = balance - totalSpent;
             balanceEl.innerText = "$" + currentBalance.toLocaleString();
             spentDisplay.innerText = "$" + totalSpent.toLocaleString();
-            spentFinal.innerText = "$" + totalSpent.toLocaleString();
+            document.getElementById('total-spent-final').innerText = "$" + totalSpent.toLocaleString();
+            
+            // เอฟเฟกต์เงินขยับ
+            header.classList.remove('shake');
+            void header.offsetWidth; // Trigger reflow
+            header.classList.add('shake');
+
             renderReceipt();
         }
 
@@ -148,7 +158,7 @@
                     item.count += amount;
                     totalSpent += cost;
                 } else {
-                    alert("เงินไม่พอครับมหาเศรษฐี!");
+                    alert("มหาเศรษฐีครับ! เงินทั้งโลกก็ยังไม่พอซื้ออันนี้!");
                 }
             } else {
                 const sellCount = Math.min(amount, item.count);
@@ -162,51 +172,58 @@
 
         function renderReceipt() {
             const boughtItems = items.filter(i => i.count > 0);
+            const receiptList = document.getElementById('receipt-list');
             if (boughtItems.length === 0) {
-                receiptList.innerHTML = '<p class="text-center italic opacity-50">ยังไม่มีการซื้อขายในขณะนี้</p>';
+                receiptList.innerHTML = '<p class="text-center italic opacity-50">Waiting for transactions...</p>';
                 return;
             }
-
             receiptList.innerHTML = boughtItems.map(i => `
-                <div class="flex justify-between items-center border-b border-zinc-900 pb-2">
-                    <div>
-                        <span class="text-white font-bold">${i.emoji} ${i.name}</span>
-                        <span class="text-xs ml-2">x ${i.count.toLocaleString()}</span>
-                    </div>
-                    <span class="text-yellow-600 font-mono">$${(i.price * i.count).toLocaleString()}</span>
+                <div class="flex justify-between items-center border-b border-zinc-900 pb-4">
+                    <span class="text-white text-xl font-bold">${i.emoji} ${i.name} x${i.count.toLocaleString()}</span>
+                    <span class="text-yellow-600 font-mono text-xl">$${(i.price * i.count).toLocaleString()}</span>
                 </div>
             `).join('');
         }
 
-        // Initialize Cards
-        items.forEach(item => {
+        items.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = 'item-card p-8 rounded-3xl flex flex-col items-center text-center relative overflow-hidden';
+            card.className = 'item-card reveal p-10 rounded-[2.5rem] flex flex-col items-center text-center relative overflow-hidden';
             card.innerHTML = `
-                <div class="text-6xl mb-6 filter drop-shadow-lg">${item.emoji}</div>
-                <h3 class="text-xl font-bold mb-2 text-white">${item.name}</h3>
-                <p class="text-yellow-500 font-mono text-lg mb-6">$${item.price.toLocaleString()}</p>
+                <div class="text-7xl mb-8 transform hover:rotate-12 transition-transform">${item.emoji}</div>
+                <h3 class="text-2xl font-bold mb-3 text-white luxury-text">${item.name}</h3>
+                <p class="text-yellow-500 font-mono text-xl mb-8 tracking-tighter">$${item.price.toLocaleString()}</p>
                 
-                <div class="bg-black/40 p-4 rounded-2xl w-full mb-4">
-                    <p class="text-xs text-zinc-500 uppercase mb-2">จำนวนที่คุณครอบครอง</p>
-                    <span id="count-${item.id}" class="text-2xl font-bold gold-gradient">0</span>
+                <div class="bg-white/5 backdrop-blur-md p-6 rounded-3xl w-full mb-6 border border-white/10">
+                    <p class="text-xs text-zinc-500 uppercase mb-2 tracking-widest">Ownership</p>
+                    <span id="count-${item.id}" class="text-3xl font-bold gold-gradient">0</span>
                 </div>
 
-                <div class="grid grid-cols-1 w-full gap-3 mt-auto">
-                    <input type="number" id="input-${item.id}" placeholder="ระบุจำนวน..." 
-                        class="bg-zinc-900 border border-zinc-700 text-center py-3 rounded-xl focus:outline-none focus:border-yellow-600 transition-all">
-                    <div class="flex gap-2">
-                        <button onclick="handleTransaction(${item.id}, false)" 
-                            class="flex-1 bg-zinc-800 hover:bg-red-900/40 py-3 rounded-xl font-bold transition-all text-sm">ขาย</button>
-                        <button onclick="handleTransaction(${item.id}, true)" 
-                            class="flex-[2] bg-yellow-600 hover:bg-yellow-500 text-black py-3 rounded-xl font-bold transition-all text-sm">ซื้อทันที</button>
+                <div class="w-full space-y-4">
+                    <input type="number" id="input-${item.id}" placeholder="จำนวน..." 
+                        class="w-full bg-zinc-900 border-2 border-zinc-800 text-center py-4 rounded-2xl focus:border-yellow-600 outline-none text-xl transition-all">
+                    <div class="flex gap-4">
+                        <button onclick="handleTransaction(${item.id}, false)" class="flex-1 bg-zinc-800 py-4 rounded-2xl font-bold hover:bg-red-900/40 text-lg">Sell</button>
+                        <button onclick="handleTransaction(${item.id}, true)" class="flex-[2] bg-yellow-600 text-black py-4 rounded-2xl font-bold text-lg">BUY NOW</button>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
         });
 
+        // ระบบตรวจจับการเลื่อนหน้าจอ (Scroll Reveal)
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Run once on load
     </script>
 </body>
 </html>
-
