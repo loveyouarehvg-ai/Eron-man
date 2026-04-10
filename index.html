@@ -1,9 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จำลองความ(โลภ) - By Achi🦛</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #020202;
+            color: #e5e5e5;
+            font-family: 'Prompt', sans-serif;
+            background-image: radial-gradient(circle at top right, #1a1a10, transparent);
+        }
+        .luxury-text { font-family: 'Cinzel', serif; letter-spacing: 2px; }
+        .gold-gradient {
+            background: linear-gradient(135deg, #d4af37 0%, #f9f295 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+        }
+        .sticky-money {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.5);
+        }
+        .item-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #333;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .item-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+        }
+        /* แอนิเมชันเด้งดึ๋ง (Bouncy Active) */
+        @keyframes bounce-click {
+            0% { transform: scale(1); }
+            30% { transform: scale(0.8) rotate(-2deg); }
+            50% { transform: scale(1.2) rotate(2deg); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .bouncy-active { animation: bounce-click 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        button { transition: transform 0.2s; }
+        button:active { transform: scale(0.9); }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="text-center py-12 border-b border-zinc-900">
+        <h1 class="text-6xl mb-3 luxury-text gold-gradient font-bold uppercase">จำลองความ(โลภ)</h1>
+        <p class="text-zinc-500 tracking-widest uppercase text-sm font-bold">By Achi🦛 - Ultimate Wealth Simulator</p>
+    </div>
+
+    <div class="sticky-money py-8 px-4">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="text-center md:text-left flex flex-col items-center md:items-start">
+                <p class="text-zinc-500 uppercase text-xs tracking-widest mb-1 font-bold">ความมั่งคั่งที่เหลืออยู่</p>
+                <div class="flex items-center gap-4">
+                    <h2 id="balance" class="text-4xl md:text-6xl font-bold gold-gradient tracking-tighter">$450,000,000,000,000</h2>
+                    <button onclick="addMoney()" class="bg-yellow-600 text-black px-5 py-2 rounded-full text-sm font-bold hover:bg-yellow-400 transition-all shadow-[0_0_20px_#d4af37]">โกงเงิน</button>
+                </div>
+            </div>
+            <div class="text-center md:text-right">
+                <p class="text-zinc-500 uppercase text-xs tracking-widest mb-1 font-bold">มูลค่ากิเลสสะสม</p>
+                <h2 id="total-spent-display" class="text-3xl md:text-4xl font-bold text-white opacity-80">$0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-16">
+        <div id="item-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+    </div>
+
+    <div class="container mx-auto px-6 pb-32">
+        <div class="bg-zinc-950 p-10 rounded-2xl border border-zinc-800 max-w-3xl mx-auto shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-yellow-600"></div>
+            <h3 class="text-3xl luxury-text mb-8 text-center gold-gradient font-bold uppercase">ใบเสร็จแห่งความโลภ</h3>
+            <div id="receipt-list" class="space-y-4 mb-8 border-b border-zinc-800 pb-8 text-zinc-400">
+                <p class="text-center italic opacity-50">ยังไม่มีการตอบสนองต่อกิเลส</p>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-2xl font-light uppercase tracking-widest">ยอดรวมกิเลส:</span>
+                <span id="total-spent-final" class="text-4xl font-bold gold-gradient">$0</span>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let balance = 450000000000000; // เงินทั้งโลก
+        let balance = 450000000000000; 
         let totalSpent = 0;
         const items = [];
 
-        // รายชื่อไอเทมพร้อมราคาตามความเป็นจริง (Market Price 2026)
         const itemNames = [
             { n: "เบอร์เกอร์เนื้อวากิวทองคำ", p: 150, e: "🍔" },
             { n: "กาแฟขี้ชะมดสกัดเย็น", p: 35, e: "☕" },
@@ -19,26 +118,23 @@
             { n: "กองทัพโดรนป้องกันฐานทัพ", p: 15000000, e: "🤖" },
             { n: "บ่อน้ำมัน (Commercial Well)", p: 85000000, e: "🛢️" },
             { n: "เครื่องบินรบ F-35 Lightning II", p: 80000000, e: "✈️" },
-            { n: "ซื้อประเทศขนาดเล็ก (เกาะรัฐอิสระ)", p: 1500000000, e: "🚩" },
+            { n: "ซื้อประเทศขนาดเล็ก", p: 1500000000, e: "🚩" },
             { n: "เรือบรรทุกเครื่องบินชั้น Ford", p: 13000000000, e: "⚓" },
-            { n: "สถานีอวกาศ ISS (กรรมสิทธิ์ส่วนตัว)", p: 150000000000, e: "🛰️" },
+            { n: "สถานีอวกาศ ISS ส่วนตัว", p: 150000000000, e: "🛰️" },
             { n: "สิทธิสัมปทานเหมืองทองคำ", p: 550000000, e: "⛏️" },
-            { n: "มหาสมุทร (พื้นที่สัมปทานวิจัย)", p: 2500000000, e: "🌊" },
+            { n: "มหาสมุทร (สัมปทานวิจัย)", p: 2500000000, e: "🌊" },
             { n: "ธนาคารพาณิชย์ขนาดใหญ่", p: 8500000000, e: "🏦" }
         ];
 
         function addMoney() {
-            balance += 10000000000000; // โกงเงินเพิ่มทีละ 10 ล้านล้าน
+            balance += 10000000000000;
             updateUI();
         }
 
-        // ปรับการสร้างของ 100 อย่างให้ราคาเพิ่มขึ้นตามความ Rare แบบสมเหตุสมผล
         for (let i = 0; i < 100; i++) {
             const base = itemNames[i % itemNames.length];
-            // ราคาเพิ่มขึ้นตามลำดับเลข 100 ชิ้นแบบสมจริง (ไม่ใช่เลขยกกำลังที่แพงเวอร์)
             let tierMult = 1 + (Math.floor(i / itemNames.length) * 0.2); 
             let finalPrice = Math.floor(base.p * tierMult);
-            
             items.push({
                 id: i,
                 name: base.n + " รุ่นที่ " + (Math.floor(i/itemNames.length)+1),
@@ -80,14 +176,13 @@
                     item.count += amount;
                     totalSpent += cost;
                 } else {
-                    alert("ความมั่งคั่งไม่เพียงพอต่อกิเลสนี้!");
+                    alert("ความมั่งคั่งไม่เพียงพอ!");
                 }
             } else {
                 const sellCount = Math.min(amount, item.count);
                 item.count -= sellCount;
                 totalSpent -= (item.price * sellCount);
             }
-            
             document.getElementById(`count-${id}`).innerText = item.count.toLocaleString();
             updateUI();
         }
@@ -98,7 +193,6 @@
                 receiptList.innerHTML = '<p class="text-center italic opacity-50">ยังไม่มีการตอบสนองต่อกิเลส</p>';
                 return;
             }
-
             receiptList.innerHTML = boughtItems.map(i => `
                 <div class="flex justify-between items-center border-b border-zinc-900 pb-2">
                     <div>
@@ -118,12 +212,10 @@
                 <div class="text-6xl mb-6 filter drop-shadow-lg">${item.emoji}</div>
                 <h3 class="text-xl font-bold mb-2 text-white">${item.name}</h3>
                 <p class="text-yellow-500 font-mono text-lg mb-6">$${item.price.toLocaleString()}</p>
-                
                 <div class="bg-black/40 p-4 rounded-2xl w-full mb-4">
                     <p class="text-xs text-zinc-500 uppercase mb-2 font-bold tracking-widest">สะสมแล้ว</p>
                     <span id="count-${item.id}" class="text-2xl font-bold gold-gradient">0</span>
                 </div>
-
                 <div class="grid grid-cols-1 w-full gap-3 mt-auto">
                     <input type="number" id="input-${item.id}" placeholder="ระบุจำนวน..." 
                         class="bg-zinc-900 border border-zinc-700 text-center py-3 rounded-xl focus:outline-none focus:border-yellow-600 transition-all text-white font-bold">
@@ -138,4 +230,5 @@
             grid.appendChild(card);
         });
     </script>
-    
+</body>
+</html>
